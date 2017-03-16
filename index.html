@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <title>atomantic/JavaScript-Playing-Cards @ GitHub</title>
+
+    <link rel="stylesheet" type="text/css" media="all" href="CardStyle.ui.css"/>
+   <style type="text/css">
+        html, body {
+			height:100%; 
+			margin:0 auto; 
+			
+			background: #67B26F; /* fallback for old browsers */
+background: -webkit-linear-gradient(to left, #67B26F , #4ca2cd); /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to left, #67B26F , #4ca2cd); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+		}
+		header, footer {
+			display:block; 
+			background-color:red; 
+			height:8%;
+			color:#fff;
+			text-align:center;
+		}
+		header {
+			font-size: 30px;
+			padding-top: 10px;
+		}
+		footer {
+			font-size: 15px;
+			padding-top: 10px;
+		}
+		.button {
+			margin-top:5px;
+			margin-bottom: 5px;
+			height : 50px;
+			width: 150px;
+			background: #4CB8C4; /* fallback for old browsers */
+background: -webkit-linear-gradient(to left, #4CB8C4 , #3CD3AD); /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to left, #4CB8C4 , #3CD3AD); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+			color : white;
+ 			border-radius : 5px;
+		}
+		section {
+			height:80%; 
+			background-color:white;
+			display:block; 
+			overflow:auto;
+		}
+				 
+        h2 {
+			font-size: 1.5em; 
+			color: #64052a;
+		}
+		#error {
+			display:none;
+			color:#f00;
+			border:1px solid #f60;
+			padding:5px;
+			margin:5px;
+		}
+       
+        .row {
+      	width: 100%;
+           height : 100%
+           margin : 0 auto;
+		}
+		.block {
+  			width: 50%;
+  			float: left;
+			 display: inline-block;
+}
+
+#panel, #flip {
+    padding: 5px;
+    text-align: center;
+    
+background: #3494E6; /* fallback for old browsers */
+background: -webkit-linear-gradient(to left, #3494E6 , #EC6EAD); /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to left, #3494E6 , #EC6EAD); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    border: solid 1px #c3c3c3;
+color : white;
+
+}
+
+#panel {
+    padding: 50px;
+    display: none;
+}
+
+
+    </style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="playingCards.js"></script>
+    <script type="text/javascript" src="playingCards.ui.js"></script>
+    <script type="text/javascript">
+
+function blinker() {
+    $('.blink_me').fadeOut(500);
+    $('.blink_me').fadeIn(500);
+}
+
+setInterval(blinker, 1000); 
+        /*
+         * example throwing cards on the table
+         */
+        $(document).ready(function(){
+            var cardDeck = $("#cardDeck").playingCards();
+            cardDeck.spread(); // show it
+			
+
+            var hand = [];
+            var showError = function(msg){
+                $('#error').html(msg).show();
+                setTimeout(function(){
+                    $('#error').fadeOut('slow');
+                },3000);
+            }
+            var showHand = function(){
+                var el = $('#yourHand')
+                el.html('');
+                for(var i=0;i<hand.length;i++){
+                    el.append(hand[i].getHTML());
+                }
+            }
+            var doShuffle = function(){
+                cardDeck.shuffle();
+                cardDeck.spread(); // update card table
+            }
+            var doDrawCard = function(){
+                var c = cardDeck.draw();
+                if(!c){
+                    showError('no more cards');
+                    return;
+                }
+                hand[hand.length] = c;
+			document.getElementById('showlabel').style.display = "block";
+                cardDeck.spread();
+                showHand();
+            }
+            var doOrderByRank = function(){
+                cardDeck.orderByRank();
+                cardDeck.spread(); // update card table
+            }
+            var doOrderBySuit = function(){
+                cardDeck.orderBySuit();
+                cardDeck.spread(); // update card table
+            }
+            $('#shuffler').click(doShuffle);
+            $('#draw').click(doDrawCard);
+            $('#shuffleDraw').click(function(){
+                doShuffle();
+                doDrawCard();
+            });
+            $('#shuffleSpreadSlow').click(function(){
+                doShuffle();
+                cardDeck.spread(null, true); // update card table
+            });
+            $('#addCard').click(function(){
+                if(!hand.length){
+                    showError('your hand is empty');
+                    return;
+                }
+                var c = hand.pop();
+                showHand();
+                cardDeck.addCard(c);
+                cardDeck.spread();
+            });
+            $('#orderByRank').click(doOrderByRank);
+            $('#orderBySuit').click(doOrderBySuit);
+
+        });
+        /*
+        // if we weren't using jquery to handle the document ready state, we would do this:
+        if (window.addEventListener) {
+            window.addEventListener("load",initPlayingCards,false);
+        } else if (window.attachEvent) {
+            window.attachEvent("onload",initPlayingCards);
+        } else {
+            window.onload = function() {initPlayingCards();}
+document.getElementById("shuffler").disabled = true;	
+        }
+        function initPlayingCards() {
+            cardDeck = new playingCards();
+        }
+        */
+    </script>
+<script>
+function hideButton(){
+document.getElementById('shuffler').disabled = true;
+document.getElementById('draw').disabled = true;
+document.getElementById('addCard').disabled = true;
+document.getElementById('orderByRank').disabled = true;
+document.getElementById('orderBySuit').disabled = true;
+}
+
+</script>
+<script> 
+$(document).ready(function(){
+    $("#flip").click(function(){
+        $("#panel").slideToggle("slow");
+	   $("#menus").toggle();
+    });
+});
+</script>
+
+</head>
+
+<body onload="hideButton()">
+
+
+ 
+
+<div id="flip" onClick="showButtons()" > <span class="blink_me">Click Here to Play Card Game</span>
+
+</div>
+
+<div id="menus" style="display:none;">
+<input type="button" class ="button" id="shuffler" value="Shuffle Me" /> 
+<input type="button" class ="button" id="draw" value="Draw a card" /> 
+<input type="button" class ="button" id="addCard" value="Put it back" />
+
+<input type="button" class ="button" id="orderByRank" value="Order by Rank" /> 
+
+<input type="button" class ="button" id="orderBySuit" value="Order by Suit" />
+
+</div>
+
+<div id="panel">
+
+
+ 	
+<div id="container" style="width: 75%; float:left;">
+
+<div id="cardDeck" style="display:none;"></div>    <br />
+	    
+		
+</div>
+	
+	
+
+<div style="width: 15%; float:left;">
+	
+<div id="error"></div>
+
+<!--	<input type="button" class ="button" id="shuffler" value="Shuffle Me" /> <br/>
+			<input type="button" class ="button" id="draw" value="Draw a card" /> <br/>
+			<input type="button" class ="button" id="addCard" value="Put it back" /><br/>
+			<input type="button" class ="button" id="orderByRank" value="Order by Rank" /> <br/>
+			<input type="button" class ="button" id="orderBySuit" value="Order by Suit" /> --!> 
+
+</div>
+
+  <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-16813977-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+ 
+
+ 
+<div style="width: 10%; float:left">
+		<h2 id="showlabel" style="display:none;">Withdrawn</h2>
+				<div id="yourHand"></div>
+	</div> 
+
+
+<div style="width:70%;"> 
+
+<center><input type="button" id="shuffleSpreadSlow" class ="button" onClick="showDiv()" value="Show Cards"/> </center>
+
+</div>
+
+<script>
+
+function showDiv() {
+   document.getElementById('cardDeck').style.display = "block";
+   document.getElementById('shuffleSpreadSlow').style.visibility = 'hidden';
+document.getElementById('shuffler').disabled = false;
+document.getElementById('draw').disabled = false;
+document.getElementById('addCard').disabled = false;
+document.getElementById('orderByRank').disabled = false;
+document.getElementById('orderBySuit').disabled = false;
+
+$('.blink_me').removeClass();
+}
+
+</script> 
+
+</div>
+   
+</body>
+</html>
+˝

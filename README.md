@@ -1,2 +1,2 @@
-# ChrisCardGame
-Card Game using Java script, HTML, CSS, Jquery
+# DemoCardGame
+Card game to generate , shuffle , withdraw and sort the deck of cards.
